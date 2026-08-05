@@ -3,3 +3,46 @@
 @import "tailwindcss/utilities.css";
 
 @import "nativewind/theme";
+
+@theme {
+  --color-background: #0b0e11;
+  --color-foreground: #e6e8eb;
+  --color-card: #14181c;
+  --color-surface: #1b2025;
+  --color-muted: #14181c;
+  --color-muted-foreground: #8b939b;
+  --color-placeholder: #5a6068;
+  --color-primary: #2e6ff2;
+  --color-primary-foreground: #ffffff;
+  --color-border: #22272c;
+  --color-success: #00d26a;
+  --color-destructive: #ff5c5c;
+  --color-warning: #ffb84d;
+
+  --spacing-0: 0px;
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-7: 28px;
+  --spacing-8: 32px;
+  --spacing-9: 36px;
+  --spacing-10: 40px;
+  --spacing-11: 44px;
+  --spacing-12: 48px;
+  --spacing-14: 56px;
+  --spacing-16: 64px;
+  --spacing-18: 72px;
+  --spacing-20: 80px;
+  --spacing-24: 96px;
+  --spacing-30: 120px;
+
+  --font-sans: sans-regular;
+  --font-sans-light: sans-light;
+  --font-sans-medium: sans-medium;
+  --font-sans-semibold: sans-semibold;
+  --font-sans-bold: sans-bold;
+  --font-sans-extrabold: sans-extrabold;
+}
