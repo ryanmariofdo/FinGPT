@@ -3,6 +3,7 @@ from decimal import Decimal
 from enum import Enum
 from uuid import UUID, uuid4
 
+from sqlalchemy import text
 from sqlmodel import Field, SQLModel
 
 
@@ -14,7 +15,11 @@ class TransactionSource(str, Enum):
 class Transaction(SQLModel, table=True):
     __tablename__ = "transactions"
 
-    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    id: UUID = Field(
+        default_factory=uuid4,
+        primary_key=True,
+        sa_column_kwargs={"server_default": text("gen_random_uuid()")},
+    )
     user_id: UUID = Field(index=True)
 
     title: str
