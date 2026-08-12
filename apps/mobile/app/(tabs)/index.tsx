@@ -1,5 +1,4 @@
 import "@/global.css";
-import { Link } from "expo-router";
 import { styled } from "nativewind";
 import { Text, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
@@ -23,12 +22,6 @@ export default function App() {
             12% vs last period
           </Text>
         </View>
-      </View>
-
-      {/* TEMPORARY: plain links until Add Expense/Income get real entry points in the UI */}
-      <View style={{ marginTop: 16, gap: 8 }}>
-        <Link href="/(add)/add-expense">Add Expense</Link>
-        <Link href="/(add)/add-income">Add Income</Link>
       </View>
     </SafeAreaView>
   );

@@ -1,9 +1,11 @@
 import { useAddTransaction } from "@/hooks/useAddTransaction";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { styled } from "nativewind";
 import React from "react";
-import { Button, Pressable, Text, TextInput, View } from "react-native";
-
-const inputStyle = { borderWidth: 1, borderColor: "#888", color: "#fff", padding: 8, margin: 8 };
+import { Pressable, Text, TextInput, View } from "react-native";
+import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
+const SafeAreaView = styled(RNSafeAreaView);
 
 const AddIncome = () => {
   const { title, setTitle, amount, setAmount, categoryId, setCategoryId, categories, saving, error, save } =
@@ -15,52 +17,106 @@ const AddIncome = () => {
   };
 
   return (
-    <View>
-      <Text>Add Income</Text>
-      <TextInput
-        placeholder="Title"
-        placeholderTextColor="#888"
-        value={title}
-        onChangeText={setTitle}
-        style={inputStyle}
-      />
-      <TextInput
-        placeholder="Amount"
-        placeholderTextColor="#888"
-        value={amount}
-        onChangeText={setAmount}
-        keyboardType="decimal-pad"
-        style={inputStyle}
-      />
-      <Text style={{ margin: 8, color: "#888" }}>Category (optional)</Text>
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginHorizontal: 8 }}>
-        <Pressable
-          onPress={() => setCategoryId(null)}
-          style={{
-            padding: 8,
-            borderWidth: 1,
-            borderColor: categoryId === null ? "#fff" : "#888",
-          }}
-        >
-          <Text style={{ color: "#fff" }}>None</Text>
+    <SafeAreaView className="flex-1 bg-background">
+      <View className="flex-row items-center justify-between p-5">
+        <Pressable hitSlop={8} onPress={() => router.back()}>
+          <Ionicons name="close" size={24} color="#8B939B" />
         </Pressable>
-        {categories.map((c) => (
-          <Pressable
-            key={c.id}
-            onPress={() => setCategoryId(c.id)}
-            style={{
-              padding: 8,
-              borderWidth: 1,
-              borderColor: categoryId === c.id ? "#fff" : "#888",
-            }}
-          >
-            <Text style={{ color: "#fff" }}>{c.name}</Text>
-          </Pressable>
-        ))}
+        <Text className="text-foreground text-base font-sans-semibold">
+          Add Income
+        </Text>
+        <View style={{ width: 24 }} />
       </View>
-      {error && <Text style={{ color: "red", margin: 8 }}>{error}</Text>}
-      <Button title={saving ? "Saving..." : "Save Income"} onPress={handleSubmit} disabled={saving} />
-    </View>
+
+      <View className="flex-1 px-5 gap-6">
+        <View className="items-center py-6 gap-2">
+          <View className="flex-row items-center gap-1 border-b border-border pb-2">
+            <Text className="text-success text-4xl font-sans-extrabold">
+              $
+            </Text>
+            <TextInput
+              placeholder="0"
+              placeholderTextColor="#5A6068"
+              value={amount}
+              onChangeText={setAmount}
+              keyboardType="decimal-pad"
+              autoFocus
+              className="text-success text-5xl font-sans-extrabold"
+              style={{ minWidth: 60 }}
+            />
+          </View>
+          <Text className="text-muted-foreground text-xs font-sans-semibold uppercase tracking-wide">
+            Amount
+          </Text>
+        </View>
+
+        <TextInput
+          placeholder="What's this for?"
+          placeholderTextColor="#5A6068"
+          value={title}
+          onChangeText={setTitle}
+          className="bg-card rounded-2xl px-4 py-3 text-foreground border border-border"
+        />
+
+        <View className="gap-2">
+          <Text className="text-muted-foreground text-xs font-sans-semibold uppercase tracking-wide">
+            Category (optional)
+          </Text>
+          <View className="flex-row flex-wrap gap-2">
+            <Pressable
+              onPress={() => setCategoryId(null)}
+              className={`px-4 py-2 rounded-full ${
+                categoryId === null ? "bg-primary" : "bg-card border border-border"
+              }`}
+            >
+              <Text
+                className={`text-sm font-sans-medium ${
+                  categoryId === null ? "text-primary-foreground" : "text-muted-foreground"
+                }`}
+              >
+                None
+              </Text>
+            </Pressable>
+            {categories.map((c) => {
+              const isActive = categoryId === c.id;
+              return (
+                <Pressable
+                  key={c.id}
+                  onPress={() => setCategoryId(c.id)}
+                  className={`px-4 py-2 rounded-full ${
+                    isActive ? "bg-primary" : "bg-card border border-border"
+                  }`}
+                >
+                  <Text
+                    className={`text-sm font-sans-medium ${
+                      isActive ? "text-primary-foreground" : "text-muted-foreground"
+                    }`}
+                  >
+                    {c.name}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
+        {error && <Text className="text-destructive text-sm">{error}</Text>}
+      </View>
+
+      <View className="p-5">
+        <Pressable
+          onPress={handleSubmit}
+          disabled={saving}
+          className={`bg-success rounded-2xl py-4 items-center ${
+            saving ? "opacity-60" : ""
+          }`}
+        >
+          <Text className="text-primary-foreground font-sans-semibold text-base">
+            {saving ? "Saving..." : "Save Income"}
+          </Text>
+        </Pressable>
+      </View>
+    </SafeAreaView>
   );
 };
 
