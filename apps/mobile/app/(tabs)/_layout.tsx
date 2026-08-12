@@ -3,6 +3,15 @@ import { router, Tabs } from "expo-router";
 import { useState } from "react";
 import { Image, Modal, Pressable, Text, View } from "react-native";
 
+const TAB_COLORS = {
+  background: "#0B0E11",
+  surface: "#1B2025",
+  primary: "#2E6FF2",
+  primaryForeground: "#FFFFFF",
+  mutedForeground: "#8B939B",
+  border: "#22272C",
+};
+
 const TabLayout = () => {
   const [sheetVisible, setSheetVisible] = useState(false);
 
@@ -16,7 +25,13 @@ const TabLayout = () => {
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarStyle: { backgroundColor: "#0b0e11" },
+          tabBarActiveTintColor: TAB_COLORS.primary,
+          tabBarInactiveTintColor: TAB_COLORS.mutedForeground,
+          tabBarStyle: {
+            backgroundColor: TAB_COLORS.background,
+            borderTopWidth: 1,
+            borderTopColor: TAB_COLORS.border,
+          },
         }}
       >
         <Tabs.Screen
@@ -61,22 +76,23 @@ const TabLayout = () => {
               <Pressable
                 onPress={() => setSheetVisible(true)}
                 style={{
-                  top: -18,
-                  alignSelf: "center",
-                  width: 56,
-                  height: 56,
-                  borderRadius: 28,
-                  backgroundColor: "#2E6FF2",
+                  flex: 1,
                   alignItems: "center",
                   justifyContent: "center",
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 4,
-                  elevation: 4,
                 }}
               >
-                <Ionicons name="add" size={28} color="#ffffff" />
+                <View
+                  style={{
+                    width: 50,
+                    height: 35,
+                    borderRadius: 12,
+                    backgroundColor: TAB_COLORS.primary,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Ionicons name="add" size={16} color={TAB_COLORS.primaryForeground} />
+                </View>
               </Pressable>
             ),
           }}
@@ -104,7 +120,19 @@ const TabLayout = () => {
             ),
           }}
         />
-        <Tabs.Screen name="profile" options={{ title: "Profile" }} />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: "Profile",
+            tabBarIcon: ({ focused, color }) => (
+              <Ionicons
+                name={focused ? "person" : "person-outline"}
+                size={24}
+                color={color}
+              />
+            ),
+          }}
+        />
         <Tabs.Screen name="finances/[id]" options={{ href: null }} />
       </Tabs>
 
@@ -127,7 +155,7 @@ const TabLayout = () => {
                 width: 40,
                 height: 4,
                 borderRadius: 2,
-                backgroundColor: "#22272C",
+                backgroundColor: TAB_COLORS.border,
                 alignSelf: "center",
                 marginBottom: 8,
               }}
