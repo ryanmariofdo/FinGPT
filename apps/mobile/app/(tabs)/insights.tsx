@@ -1,45 +1,28 @@
+import { TIME_RANGES, useInsights } from "@/hooks/useInsights";
 import { styled } from "nativewind";
-import React, { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import React from "react";
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 const SafeAreaView = styled(RNSafeAreaView);
 
-const TIME_RANGES = ["Daily", "Weekly", "Monthly", "Yearly"] as const;
-type TimeRange = (typeof TIME_RANGES)[number];
-
-const CATEGORIES = [
-  "All",
-  "Food",
-  "Groceries",
-  "Transport",
-  "Shopping",
-  "Bills",
-  "Subscriptions",
-];
-
-const TREND_BARS = [40, 65, 30, 95, 55, 30, 80];
-const ACTIVE_BAR_INDICES = [1, 5];
+const formatAmount = (amount: number) =>
+  `${amount >= 0 ? "" : "− "}$${Math.abs(amount).toFixed(0)}`;
 
 const Insights = () => {
-  const [timeRange, setTimeRange] = useState<TimeRange>("Monthly");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([
-    "All",
-  ]);
-
-  const toggleCategory = (category: string) => {
-    if (category === "All") {
-      setSelectedCategories(["All"]);
-      return;
-    }
-    setSelectedCategories((prev) => {
-      const withoutAll = prev.filter((c) => c !== "All");
-      const isSelected = withoutAll.includes(category);
-      const next = isSelected
-        ? withoutAll.filter((c) => c !== category)
-        : [...withoutAll, category];
-      return next.length === 0 ? ["All"] : next;
-    });
-  };
+  const {
+    timeRange,
+    setTimeRange,
+    monthLabel,
+    goToPreviousMonth,
+    goToNextMonth,
+    categoryOptions,
+    selectedCategoryIds,
+    toggleCategory,
+    total,
+    trendBars,
+    loading,
+    error,
+  } = useInsights();
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -81,13 +64,13 @@ const Insights = () => {
         </View>
 
         <View className="flex-row items-center justify-between bg-card rounded-2xl px-4 py-4">
-          <Pressable hitSlop={8}>
+          <Pressable hitSlop={8} onPress={goToPreviousMonth}>
             <Text className="text-muted-foreground text-base">‹</Text>
           </Pressable>
           <Text className="text-foreground text-sm font-sans-medium">
-            Jul 1 – Jul 31, 2026
+            {monthLabel}
           </Text>
-          <Pressable hitSlop={8}>
+          <Pressable hitSlop={8} onPress={goToNextMonth}>
             <Text className="text-muted-foreground text-base">›</Text>
           </Pressable>
         </View>
@@ -97,12 +80,15 @@ const Insights = () => {
             Category Filter (multi-select)
           </Text>
           <View className="flex-row flex-wrap gap-2">
-            {CATEGORIES.map((category) => {
-              const isActive = selectedCategories.includes(category);
+            {categoryOptions.map((category) => {
+              const isActive =
+                category.id === null
+                  ? selectedCategoryIds.length === 0
+                  : selectedCategoryIds.includes(category.id);
               return (
                 <Pressable
-                  key={category}
-                  onPress={() => toggleCategory(category)}
+                  key={category.id ?? "all"}
+                  onPress={() => toggleCategory(category.id)}
                   className={`px-4 py-2 rounded-full ${
                     isActive
                       ? "bg-primary"
@@ -114,7 +100,7 @@ const Insights = () => {
                       isActive ? "text-primary-foreground" : "text-muted-foreground"
                     }`}
                   >
-                    {category}
+                    {category.name}
                   </Text>
                 </Pressable>
               );
@@ -122,12 +108,15 @@ const Insights = () => {
           </View>
         </View>
 
+        {loading && <ActivityIndicator />}
+        {error && <Text className="text-destructive text-sm">{error}</Text>}
+
         <View className="bg-card rounded-2xl p-5 gap-2">
           <Text className="text-muted-foreground text-xs font-sans-semibold uppercase tracking-wide">
             Total (filtered)
           </Text>
           <Text className="text-foreground text-4xl font-sans-bold">
-            − $3,240
+            {formatAmount(-total)}
           </Text>
         </View>
 
@@ -136,13 +125,11 @@ const Insights = () => {
             Trend
           </Text>
           <View className="flex-row items-end justify-between gap-2 h-40">
-            {TREND_BARS.map((height, index) => (
+            {trendBars.map((bar) => (
               <View
-                key={index}
-                className={`flex-1 rounded-md ${
-                  ACTIVE_BAR_INDICES.includes(index) ? "bg-primary" : "bg-surface"
-                }`}
-                style={{ height: `${height}%` }}
+                key={bar.bucket}
+                className="flex-1 rounded-md bg-primary"
+                style={{ height: `${bar.heightPercent}%` }}
               />
             ))}
           </View>
