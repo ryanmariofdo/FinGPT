@@ -29,6 +29,7 @@ class TransactionRead(SQLModel):
     category_id: UUID | None
     source: TransactionSource
     occurred_at: date
+    needs_review: bool
     created_at: datetime
 
 

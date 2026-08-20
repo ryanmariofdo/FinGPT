@@ -27,5 +27,8 @@ class Transaction(SQLModel, table=True):
     category_id: UUID | None = Field(default=None, foreign_key="categories.id")
     source: TransactionSource
     occurred_at: date
+    dedupe_hash: str | None = Field(default=None, index=True)
+    needs_review: bool = Field(default=False)
+    raw_source_text: str | None = Field(default=None)
 
     created_at: datetime = Field(default_factory=datetime.utcnow)
