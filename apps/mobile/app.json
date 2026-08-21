@@ -19,7 +19,16 @@
     "web": {
       "output": "static"
     },
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow FinGPT to access your photos to scan receipts.",
+          "cameraPermission": "Allow FinGPT to use your camera to scan receipts."
+        }
+      ]
+    ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
