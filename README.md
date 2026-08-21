@@ -1,14 +1,14 @@
-# FinanceGPT
+# FinGPT
 
-Personal Automated Finance Copilot.
+An AI-powered finance copilot that automatically tracks finances and delivers personalized financial advice.
 
-## MAIN FUNCTIONAL REQUIREMENTS
+## 🚀 MAIN FUNCTIONAL REQUIREMENTS
 
 - Automated SMS capture of expenses + income and automatically catergorize them (Food, Transport, Bills, etc).
 - Scan bill/receipt (OCR).
-- AI Chatbot (Gemini AI API) to provid financial insights based on user's finances.
+- AI Chatbot integrated with Gemini AI API to provide only financial insights based on user's finances.
 
-## TECH STACK
+## 🛠️ TECH STACK
 
 - React Native + Expo Routing for mobile frontend
 - Python FASTAPI for backend
