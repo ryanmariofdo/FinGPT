@@ -105,8 +105,10 @@ export function useFinances() {
     const yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
 
+    const sorted = [...items].sort((a, b) => b.occurredAt.localeCompare(a.occurredAt));
+
     const buckets = new Map<string, Transaction[]>();
-    for (const item of items) {
+    for (const item of sorted) {
       const occurred = new Date(item.occurredAt);
       const label = isSameDay(occurred, today)
         ? "Today"
