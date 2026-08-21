@@ -5,6 +5,7 @@ from uuid import UUID
 from sqlmodel import SQLModel
 
 from app.models.transaction import TransactionSource
+from app.schemas.receipt_item import ReceiptItemInput, ReceiptItemRead
 
 
 class TransactionCreate(SQLModel):
@@ -12,6 +13,8 @@ class TransactionCreate(SQLModel):
     amount: Decimal
     category_id: UUID | None = None
     occurred_at: date
+    image_url: str | None = None
+    items: list[ReceiptItemInput] | None = None
 
 
 class TransactionUpdate(SQLModel):
@@ -30,6 +33,8 @@ class TransactionRead(SQLModel):
     source: TransactionSource
     occurred_at: date
     needs_review: bool
+    image_url: str | None
+    items: list[ReceiptItemRead]
     created_at: datetime
 
 

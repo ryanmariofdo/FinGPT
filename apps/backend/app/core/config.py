@@ -8,7 +8,8 @@ class Settings(BaseSettings):
 
     database_url: str
     supabase_url: str
-    gemini_api_key: str
+    supabase_service_role_key: str
+    nvidia_api_key: str
 
 
 @lru_cache

@@ -9,6 +9,7 @@ from app.deps import CurrentUserId, SessionDep
 from app.models import Transaction
 from app.models.transaction import TransactionSource
 from app.schemas.sms_ingest import SmsIngestRequest, SmsIngestResponse
+from app.schemas.transaction import TransactionRead
 from app.services.sms_parsing import parse_transaction_sms
 
 DEDUPE_WINDOW = timedelta(minutes=5)
@@ -26,6 +27,10 @@ def _dedupe_hash(user_id, raw_text: str) -> str:
     return hashlib.sha256(f"{user_id}{normalized}".encode()).hexdigest()
 
 
+def _to_read(transaction: Transaction) -> TransactionRead:
+    return TransactionRead(**transaction.model_dump(), items=[])
+
+
 @router.post("/ingest-sms", response_model=SmsIngestResponse)
 def ingest_sms(body: SmsIngestRequest, session: SessionDep, user_id: CurrentUserId):
     dedupe_hash = _dedupe_hash(user_id, body.raw_text)
@@ -38,7 +43,7 @@ def ingest_sms(body: SmsIngestRequest, session: SessionDep, user_id: CurrentUser
     )
     existing = session.exec(statement).first()
     if existing is not None:
-        return SmsIngestResponse(transaction=existing, duplicate=True)
+        return SmsIngestResponse(transaction=_to_read(existing), duplicate=True)
 
     fallback_occurred_at = (body.received_at or datetime.utcnow()).date()
     parsed = parse_transaction_sms(body.raw_text)
@@ -84,6 +89,6 @@ def ingest_sms(body: SmsIngestRequest, session: SessionDep, user_id: CurrentUser
     if earlier is not None and earlier.created_at < db_transaction.created_at:
         session.delete(db_transaction)
         session.commit()
-        return SmsIngestResponse(transaction=earlier, duplicate=True)
+        return SmsIngestResponse(transaction=_to_read(earlier), duplicate=True)
 
-    return SmsIngestResponse(transaction=db_transaction, duplicate=False)
+    return SmsIngestResponse(transaction=_to_read(db_transaction), duplicate=False)

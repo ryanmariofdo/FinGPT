@@ -10,6 +10,7 @@ from sqlmodel import Field, SQLModel
 class TransactionSource(str, Enum):
     manual = "manual"
     sms = "sms"
+    receipt = "receipt"
 
 
 class Transaction(SQLModel, table=True):
@@ -30,5 +31,6 @@ class Transaction(SQLModel, table=True):
     dedupe_hash: str | None = Field(default=None, index=True)
     needs_review: bool = Field(default=False)
     raw_source_text: str | None = Field(default=None)
+    image_url: str | None = Field(default=None)
 
     created_at: datetime = Field(default_factory=datetime.utcnow)
