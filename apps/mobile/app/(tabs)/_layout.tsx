@@ -15,7 +15,9 @@ const TAB_COLORS = {
 const TabLayout = () => {
   const [sheetVisible, setSheetVisible] = useState(false);
 
-  const openOption = (path: "/(add)/add-expense" | "/(add)/add-income") => {
+  const openOption = (
+    path: "/(add)/add-expense" | "/(add)/add-income" | "/(add)/scan-receipt"
+  ) => {
     setSheetVisible(false);
     router.push(path);
   };
@@ -178,6 +180,16 @@ const TabLayout = () => {
               <Ionicons name="arrow-up-circle" size={22} color="#00D26A" />
               <Text className="text-foreground text-base font-sans-medium">
                 Add Income
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => openOption("/(add)/scan-receipt")}
+              className="bg-card rounded-2xl p-4 flex-row items-center gap-3"
+            >
+              <Ionicons name="camera" size={22} color={TAB_COLORS.primary} />
+              <Text className="text-foreground text-base font-sans-medium">
+                Scan Receipt
               </Text>
             </Pressable>
           </Pressable>

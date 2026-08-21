@@ -28,6 +28,25 @@ async function request(path: string, options: RequestInit = {}) {
   return response.json();
 }
 
+async function upload(path: string, formData: FormData) {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const response = await fetch(`${API_URL}${path}`, {
+    method: "POST",
+    headers: session ? { Authorization: `Bearer ${session.access_token}` } : {},
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`${response.status} ${response.statusText}: ${body}`);
+  }
+
+  return response.json();
+}
+
 export const api = {
   get: (path: string) => request(path),
   post: (path: string, body: unknown) =>
@@ -35,4 +54,5 @@ export const api = {
   patch: (path: string, body: unknown) =>
     request(path, { method: "PATCH", body: JSON.stringify(body) }),
   delete: (path: string) => request(path, { method: "DELETE" }),
+  upload,
 };
