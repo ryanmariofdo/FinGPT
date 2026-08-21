@@ -1,4 +1,5 @@
 import { SOURCES, TYPES, useFinances } from "@/hooks/useFinances";
+import { router } from "expo-router";
 import { styled } from "nativewind";
 import React from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
@@ -157,8 +158,9 @@ const Finances = () => {
               </Text>
               <View className="gap-2">
                 {items.map((tx) => (
-                  <View
+                  <Pressable
                     key={tx.id}
+                    onPress={() => router.push(`/finances/${tx.id}`)}
                     className="flex-row items-center justify-between bg-card rounded-2xl px-4 py-3"
                   >
                     <View className="flex-row items-center gap-3 flex-1 pr-2">
@@ -188,7 +190,7 @@ const Finances = () => {
                     >
                       {formatAmount(tx.amount)}
                     </Text>
-                  </View>
+                  </Pressable>
                 ))}
               </View>
             </View>

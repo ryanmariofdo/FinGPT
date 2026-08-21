@@ -2,7 +2,7 @@ import { ReceiptItemsEditor } from "@/components/ReceiptItemsEditor";
 import { useScanReceipt } from "@/hooks/useScanReceipt";
 import { api } from "@/lib/api";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { styled } from "nativewind";
 import { useEffect, useState } from "react";
 import { Image, Pressable, ScrollView, Text, TextInput, View } from "react-native";
@@ -12,6 +12,9 @@ const SafeAreaView = styled(RNSafeAreaView);
 type Category = { id: string; name: string };
 
 const ScanReceipt = () => {
+  const { transactionId } = useLocalSearchParams<{ transactionId?: string }>();
+  const isAttach = !!transactionId;
+
   const {
     imageUri,
     pickImage,
@@ -32,7 +35,9 @@ const ScanReceipt = () => {
     saving,
     error,
     save,
-  } = useScanReceipt({ mode: "create" });
+  } = useScanReceipt(
+    isAttach ? { mode: "attach", transactionId } : { mode: "create" }
+  );
 
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -139,47 +144,49 @@ const ScanReceipt = () => {
               className="bg-card rounded-2xl px-4 py-3 text-foreground border border-border"
             />
 
-            <View className="gap-2">
-              <Text className="text-muted-foreground text-xs font-sans-semibold uppercase tracking-wide">
-                Category (optional)
-              </Text>
-              <View className="flex-row flex-wrap gap-2">
-                <Pressable
-                  onPress={() => setCategoryId(null)}
-                  className={`px-4 py-2 rounded-full ${
-                    categoryId === null ? "bg-primary" : "bg-card border border-border"
-                  }`}
-                >
-                  <Text
-                    className={`text-sm font-sans-medium ${
-                      categoryId === null ? "text-primary-foreground" : "text-muted-foreground"
+            {!isAttach && (
+              <View className="gap-2">
+                <Text className="text-muted-foreground text-xs font-sans-semibold uppercase tracking-wide">
+                  Category (optional)
+                </Text>
+                <View className="flex-row flex-wrap gap-2">
+                  <Pressable
+                    onPress={() => setCategoryId(null)}
+                    className={`px-4 py-2 rounded-full ${
+                      categoryId === null ? "bg-primary" : "bg-card border border-border"
                     }`}
                   >
-                    None
-                  </Text>
-                </Pressable>
-                {categories.map((c) => {
-                  const isActive = categoryId === c.id;
-                  return (
-                    <Pressable
-                      key={c.id}
-                      onPress={() => setCategoryId(c.id)}
-                      className={`px-4 py-2 rounded-full ${
-                        isActive ? "bg-primary" : "bg-card border border-border"
+                    <Text
+                      className={`text-sm font-sans-medium ${
+                        categoryId === null ? "text-primary-foreground" : "text-muted-foreground"
                       }`}
                     >
-                      <Text
-                        className={`text-sm font-sans-medium ${
-                          isActive ? "text-primary-foreground" : "text-muted-foreground"
+                      None
+                    </Text>
+                  </Pressable>
+                  {categories.map((c) => {
+                    const isActive = categoryId === c.id;
+                    return (
+                      <Pressable
+                        key={c.id}
+                        onPress={() => setCategoryId(c.id)}
+                        className={`px-4 py-2 rounded-full ${
+                          isActive ? "bg-primary" : "bg-card border border-border"
                         }`}
                       >
-                        {c.name}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
+                        <Text
+                          className={`text-sm font-sans-medium ${
+                            isActive ? "text-primary-foreground" : "text-muted-foreground"
+                          }`}
+                        >
+                          {c.name}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
               </View>
-            </View>
+            )}
 
             <ReceiptItemsEditor
               items={items}
@@ -203,7 +210,7 @@ const ScanReceipt = () => {
             }`}
           >
             <Text className="text-primary-foreground font-sans-semibold text-base">
-              {saving ? "Saving..." : "Save Expense"}
+              {saving ? "Saving..." : isAttach ? "Update Expense" : "Save Expense"}
             </Text>
           </Pressable>
         </View>

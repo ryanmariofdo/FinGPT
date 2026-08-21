@@ -6,7 +6,7 @@ An AI-powered finance copilot that automatically tracks finances and delivers pe
 
 - Automated SMS capture of expenses + income and automatically catergorize them (Food, Transport, Bills, etc).
 - Scan bill/receipt (OCR).
-- AI Chatbot integrated with Gemini AI API to provide only financial insights based on user's finances.
+- AI Chatbot integrated to provide financial insights based on user's finances.
 
 ## 🛠️ TECH STACK
 
