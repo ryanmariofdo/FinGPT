@@ -1,7 +1,7 @@
 import { api } from "@/lib/api";
 import { useEffect, useMemo, useState } from "react";
 
-export const SOURCES = ["All", "Auto (SMS)", "Manual"] as const;
+export const SOURCES = ["All", "Auto (SMS)", "Manual", "Scanned"] as const;
 export type Source = (typeof SOURCES)[number];
 
 export const TYPES = ["All", "Expenses", "Income"] as const;
@@ -23,7 +23,7 @@ type ApiTransaction = {
   title: string;
   amount: string;
   category_id: string | null;
-  source: "manual" | "sms";
+  source: "manual" | "sms" | "receipt";
   occurred_at: string;
 };
 
@@ -60,6 +60,7 @@ export function useFinances() {
     const params = new URLSearchParams({ date_from, date_to });
     if (source === "Auto (SMS)") params.set("source", "sms");
     if (source === "Manual") params.set("source", "manual");
+    if (source === "Scanned") params.set("source", "receipt");
     if (type === "Income") params.set("type", "income");
     if (type === "Expenses") params.set("type", "expense");
 
@@ -91,7 +92,8 @@ export function useFinances() {
         id: tx.id,
         title: tx.title,
         category: categoryName(tx.category_id),
-        source: tx.source === "sms" ? "Auto (SMS)" : "Manual",
+        source:
+          tx.source === "sms" ? "Auto (SMS)" : tx.source === "receipt" ? "Scanned" : "Manual",
         amount: Number(tx.amount),
         occurredAt: tx.occurred_at,
       })),

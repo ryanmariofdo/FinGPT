@@ -125,6 +125,8 @@ export function useScanReceipt(target: Mode) {
         await api.post(`/transactions/${target.transactionId}/receipt-items`, {
           image_url: imageUrl,
           items: parsedItems,
+          amount: -parsedAmount,
+          occurred_at: occurredAt,
         });
       }
       return true;

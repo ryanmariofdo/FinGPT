@@ -76,7 +76,7 @@ def create_transaction(
     db_transaction = Transaction(
         **fields,
         user_id=user_id,
-        source=TransactionSource.manual,
+        source=TransactionSource.receipt if transaction.image_url else TransactionSource.manual,
     )
     session.add(db_transaction)
     try:
@@ -223,7 +223,12 @@ def attach_receipt_items(
     for item in existing_items:
         session.delete(item)
 
-    transaction.image_url = body.image_url
+    if body.image_url is not None:
+        transaction.image_url = body.image_url
+    if body.title is not None:
+        transaction.title = body.title
+    if body.category_id is not None:
+        transaction.category_id = body.category_id
     if body.amount is not None:
         transaction.amount = body.amount
     if body.occurred_at is not None:
