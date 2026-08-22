@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { router, Tabs } from "expo-router";
+import { router, Tabs, usePathname } from "expo-router";
 import { useState } from "react";
 import { Image, Modal, Pressable, Text, View } from "react-native";
 
@@ -14,6 +14,8 @@ const TAB_COLORS = {
 
 const TabLayout = () => {
   const [sheetVisible, setSheetVisible] = useState(false);
+  const pathname = usePathname();
+  const hideChatButton = pathname === "/profile";
 
   const openOption = (
     path: "/(add)/add-expense" | "/(add)/add-income" | "/(add)/scan-receipt"
@@ -137,6 +139,26 @@ const TabLayout = () => {
         />
         <Tabs.Screen name="finances/[id]" options={{ href: null }} />
       </Tabs>
+
+      {!hideChatButton && (
+        <Pressable
+          onPress={() => router.push("/chat")}
+          style={{
+            position: "absolute",
+            right: 25,
+            bottom: 120,
+            width: 60,
+            height: 60,
+            borderRadius: 30,
+            backgroundColor: TAB_COLORS.primary,
+            alignItems: "center",
+            justifyContent: "center",
+            elevation: 4,
+          }}
+        >
+          <Ionicons name="chatbubble-ellipses" size={22} color={TAB_COLORS.primaryForeground} />
+        </Pressable>
+      )}
 
       <Modal
         visible={sheetVisible}
