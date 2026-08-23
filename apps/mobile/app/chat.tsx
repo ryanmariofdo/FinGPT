@@ -29,7 +29,7 @@ const Chat = () => {
           FinGPT AI Assistant
         </Text>
         <Pressable hitSlop={8} onPress={clearChat}>
-          <Ionicons name="refresh" size={20} color="#8B939B" />
+          <Ionicons name="trash-outline" size={20} color="#8B939B" />
         </Pressable>
       </View>
 

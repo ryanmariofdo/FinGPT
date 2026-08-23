@@ -1,5 +1,7 @@
 import { CategoryPicker } from "@/components/CategoryPicker";
 import { useAddTransaction } from "@/hooks/useAddTransaction";
+import { usePreferences } from "@/hooks/usePreferences";
+import { CURRENCIES } from "@/lib/currency";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { styled } from "nativewind";
@@ -9,6 +11,9 @@ import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 const SafeAreaView = styled(RNSafeAreaView);
 
 const AddExpense = () => {
+  const { currency } = usePreferences();
+  const currencySymbol = CURRENCIES.find((c) => c.code === currency)?.symbol ?? "$";
+
   const {
     title,
     setTitle,
@@ -44,7 +49,7 @@ const AddExpense = () => {
         <View className="items-center py-6 gap-2">
           <View className="flex-row items-center gap-1 border-b border-border pb-2">
             <Text className="text-destructive text-4xl font-sans-extrabold">
-              $
+              {currencySymbol}
             </Text>
             <TextInput
               placeholder="0"

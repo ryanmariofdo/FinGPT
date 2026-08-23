@@ -33,12 +33,28 @@ const Profile = () => {
       </View>
 
       <Pressable
+        onPress={() => router.push("/general")}
+        className="flex-row items-center justify-between bg-card rounded-2xl p-4"
+      >
+        <View className="flex-row items-center gap-3">
+          <Ionicons name="settings-outline" size={20} color="#8B939B" />
+          <Text className="text-foreground text-base font-sans-medium">
+            General Settings
+          </Text>
+        </View>
+        <Ionicons name="chevron-forward" size={18} color="#8B939B" />
+      </Pressable>
+
+      <Pressable
         onPress={() => router.push("/preferences")}
         className="flex-row items-center justify-between bg-card rounded-2xl p-4"
       >
-        <Text className="text-foreground text-base font-sans-medium">
-          Preferences
-        </Text>
+        <View className="flex-row items-center gap-3">
+          <Ionicons name="options-outline" size={20} color="#8B939B" />
+          <Text className="text-foreground text-base font-sans-medium">
+            Preferences
+          </Text>
+        </View>
         <Ionicons name="chevron-forward" size={18} color="#8B939B" />
       </Pressable>
 
