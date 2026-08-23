@@ -2,7 +2,7 @@ import { SOURCES, TYPES, useFinances } from "@/hooks/useFinances";
 import { router } from "expo-router";
 import { styled } from "nativewind";
 import React from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 const SafeAreaView = styled(RNSafeAreaView);
 
@@ -22,14 +22,16 @@ const Finances = () => {
     summary,
     loading,
     error,
+    refetch,
   } = useFinances();
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView edges={["top", "left", "right"]} className="flex-1 bg-background">
       <ScrollView
         className="flex-1"
         contentContainerClassName="p-5 gap-6"
         showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={refetch} />}
       >
         <Text className="text-foreground text-2xl font-sans-bold">
           Finances
@@ -118,7 +120,6 @@ const Finances = () => {
           </View>
         </View>
 
-        {loading && <ActivityIndicator />}
         {error && <Text className="text-destructive text-sm">{error}</Text>}
 
         {summary && (

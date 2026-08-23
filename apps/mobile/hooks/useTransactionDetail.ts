@@ -1,7 +1,6 @@
+import { useCategories } from "@/hooks/useCategories";
 import { api } from "@/lib/api";
 import { useCallback, useEffect, useState } from "react";
-
-type Category = { id: string; name: string };
 
 type ReceiptItem = { id: string; name: string; amount: string };
 
@@ -21,7 +20,7 @@ type ApiTransaction = {
 
 export function useTransactionDetail(id: string) {
   const [transaction, setTransaction] = useState<ApiTransaction | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { categories, createCategory } = useCategories();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -38,10 +37,10 @@ export function useTransactionDetail(id: string) {
   const refresh = useCallback(() => {
     setLoading(true);
     setError(null);
-    Promise.all([api.get(`/transactions/${id}`), api.get("/categories")])
-      .then(([tx, cats]: [ApiTransaction, Category[]]) => {
+    api
+      .get(`/transactions/${id}`)
+      .then((tx: ApiTransaction) => {
         setTransaction(tx);
-        setCategories(cats);
         setTitle(tx.title);
         setAmount(String(Math.abs(Number(tx.amount))));
         setKind(Number(tx.amount) < 0 ? "expense" : "income");
@@ -129,6 +128,7 @@ export function useTransactionDetail(id: string) {
     transaction,
     categoryName,
     categories,
+    createCategory,
     loading,
     error,
     refresh,
