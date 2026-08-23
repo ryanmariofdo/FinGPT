@@ -1,5 +1,6 @@
 import { api } from "@/lib/api";
-import { useEffect, useMemo, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export const TIME_RANGES = ["Daily", "Weekly", "Monthly", "Yearly"] as const;
 export type TimeRange = (typeof TIME_RANGES)[number];
@@ -50,7 +51,7 @@ export function useInsights() {
     api.get("/categories").then(setCategories).catch((err) => setError(err.message));
   }, []);
 
-  useEffect(() => {
+  const fetchData = useCallback(() => {
     const { date_from, date_to } = monthRange(month);
     const categoryIds = selectedCategoryIds.length ? selectedCategoryIds : [null];
 
@@ -93,6 +94,8 @@ export function useInsights() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [month, timeRange, selectedCategoryIds]);
 
+  useFocusEffect(fetchData);
+
   const categoryOptions = useMemo(
     () => [{ id: null as string | null, name: "All" }, ...categories],
     [categories],
@@ -132,5 +135,6 @@ export function useInsights() {
     trendBars,
     loading,
     error,
+    refetch: fetchData,
   };
 }

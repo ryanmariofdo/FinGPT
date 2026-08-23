@@ -1,19 +1,22 @@
+import { CategoryPicker } from "@/components/CategoryPicker";
 import { ReceiptItemsEditor } from "@/components/ReceiptItemsEditor";
+import { useCategories } from "@/hooks/useCategories";
+import { usePreferences } from "@/hooks/usePreferences";
 import { useScanReceipt } from "@/hooks/useScanReceipt";
-import { api } from "@/lib/api";
+import { CURRENCIES } from "@/lib/currency";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { styled } from "nativewind";
-import { useEffect, useState } from "react";
 import { Image, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 const SafeAreaView = styled(RNSafeAreaView);
 
-type Category = { id: string; name: string };
-
 const ScanReceipt = () => {
   const { transactionId } = useLocalSearchParams<{ transactionId?: string }>();
   const isAttach = !!transactionId;
+
+  const { currency } = usePreferences();
+  const currencySymbol = CURRENCIES.find((c) => c.code === currency)?.symbol ?? "$";
 
   const {
     imageUri,
@@ -39,11 +42,7 @@ const ScanReceipt = () => {
     isAttach ? { mode: "attach", transactionId } : { mode: "create" }
   );
 
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  useEffect(() => {
-    api.get("/categories").then(setCategories).catch(() => {});
-  }, []);
+  const { categories, createCategory } = useCategories();
 
   const handleSubmit = async () => {
     const success = await save();
@@ -111,7 +110,7 @@ const ScanReceipt = () => {
             <View className="items-center py-2 gap-2">
               <View className="flex-row items-center gap-1 border-b border-border pb-2">
                 <Text className="text-destructive text-4xl font-sans-extrabold">
-                  $
+                  {currencySymbol}
                 </Text>
                 <TextInput
                   placeholder="0"
@@ -149,42 +148,12 @@ const ScanReceipt = () => {
                 <Text className="text-muted-foreground text-xs font-sans-semibold uppercase tracking-wide">
                   Category (optional)
                 </Text>
-                <View className="flex-row flex-wrap gap-2">
-                  <Pressable
-                    onPress={() => setCategoryId(null)}
-                    className={`px-4 py-2 rounded-full ${
-                      categoryId === null ? "bg-primary" : "bg-card border border-border"
-                    }`}
-                  >
-                    <Text
-                      className={`text-sm font-sans-medium ${
-                        categoryId === null ? "text-primary-foreground" : "text-muted-foreground"
-                      }`}
-                    >
-                      None
-                    </Text>
-                  </Pressable>
-                  {categories.map((c) => {
-                    const isActive = categoryId === c.id;
-                    return (
-                      <Pressable
-                        key={c.id}
-                        onPress={() => setCategoryId(c.id)}
-                        className={`px-4 py-2 rounded-full ${
-                          isActive ? "bg-primary" : "bg-card border border-border"
-                        }`}
-                      >
-                        <Text
-                          className={`text-sm font-sans-medium ${
-                            isActive ? "text-primary-foreground" : "text-muted-foreground"
-                          }`}
-                        >
-                          {c.name}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
+                <CategoryPicker
+                  categories={categories}
+                  selectedId={categoryId}
+                  onSelect={setCategoryId}
+                  onCreate={createCategory}
+                />
               </View>
             )}
 

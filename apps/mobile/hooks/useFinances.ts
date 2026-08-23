@@ -1,5 +1,6 @@
 import { api } from "@/lib/api";
-import { useEffect, useMemo, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
 
 export const SOURCES = ["All", "Auto (SMS)", "Manual", "Scanned"] as const;
 export type Source = (typeof SOURCES)[number];
@@ -55,7 +56,7 @@ export function useFinances() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchData = useCallback(() => {
     const { date_from, date_to } = monthRange(month);
     const params = new URLSearchParams({ date_from, date_to });
     if (source === "Auto (SMS)") params.set("source", "sms");
@@ -81,6 +82,8 @@ export function useFinances() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [month, source, type]);
 
+  useFocusEffect(fetchData);
+
   const categoryName = useMemo(() => {
     const map = new Map(categories.map((c) => [c.id, c.name]));
     return (id: string | null) => (id ? (map.get(id) ?? "Uncategorized") : "Uncategorized");
@@ -99,6 +102,17 @@ export function useFinances() {
       })),
     [transactions, categoryName],
   );
+
+  const categoryBreakdown = useMemo(() => {
+    const totals = new Map<string, number>();
+    for (const item of items) {
+      if (item.amount >= 0) continue;
+      totals.set(item.category, (totals.get(item.category) ?? 0) + Math.abs(item.amount));
+    }
+    return Array.from(totals.entries())
+      .map(([category, value]) => ({ category, value }))
+      .sort((a, b) => b.value - a.value);
+  }, [items]);
 
   const groups = useMemo(() => {
     const today = new Date();
@@ -129,10 +143,12 @@ export function useFinances() {
     goToPreviousMonth: () => setMonth((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1)),
     goToNextMonth: () => setMonth((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1)),
     groups,
+    categoryBreakdown,
     summary: summary
       ? { income: Number(summary.income), expenses: Number(summary.expenses), net: Number(summary.net) }
       : null,
     loading,
     error,
+    refetch: fetchData,
   };
 }

@@ -1,5 +1,8 @@
+import { CategoryPicker } from "@/components/CategoryPicker";
 import { ReceiptItemsEditor } from "@/components/ReceiptItemsEditor";
 import { useTransactionDetail } from "@/hooks/useTransactionDetail";
+import { usePreferences } from "@/hooks/usePreferences";
+import { CURRENCIES, formatCurrency } from "@/lib/currency";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { styled } from "nativewind";
@@ -22,15 +25,17 @@ const SOURCE_LABEL: Record<string, string> = {
   receipt: "Scanned",
 };
 
-const formatAmount = (amount: number) =>
-  `${amount >= 0 ? "+" : "−"}$${Math.abs(amount).toFixed(2)}`;
-
 const FinanceDetails = () => {
   const id = useLocalSearchParams<{ id: string }>().id;
+  const { currency } = usePreferences();
+  const formatAmount = (amount: number) => formatCurrency(amount, currency);
+  const currencySymbol = CURRENCIES.find((c) => c.code === currency)?.symbol ?? "$";
+
   const {
     transaction,
     categoryName,
     categories,
+    createCategory,
     loading,
     error,
     editing,
@@ -132,7 +137,7 @@ const FinanceDetails = () => {
                   >
                     <Text className="text-foreground text-sm">{item.name}</Text>
                     <Text className="text-foreground text-sm font-sans-medium">
-                      ${Number(item.amount).toFixed(2)}
+                      {formatCurrency(Number(item.amount), currency)}
                     </Text>
                   </View>
                 ))}
@@ -197,7 +202,7 @@ const FinanceDetails = () => {
 
           <View className="items-center py-2 gap-2">
             <View className="flex-row items-center gap-1 border-b border-border pb-2">
-              <Text className="text-destructive text-4xl font-sans-extrabold">$</Text>
+              <Text className="text-destructive text-4xl font-sans-extrabold">{currencySymbol}</Text>
               <TextInput
                 placeholder="0"
                 placeholderTextColor="#5A6068"
@@ -233,42 +238,12 @@ const FinanceDetails = () => {
             <Text className="text-muted-foreground text-xs font-sans-semibold uppercase tracking-wide">
               Category (optional)
             </Text>
-            <View className="flex-row flex-wrap gap-2">
-              <Pressable
-                onPress={() => setCategoryId(null)}
-                className={`px-4 py-2 rounded-full ${
-                  categoryId === null ? "bg-primary" : "bg-card border border-border"
-                }`}
-              >
-                <Text
-                  className={`text-sm font-sans-medium ${
-                    categoryId === null ? "text-primary-foreground" : "text-muted-foreground"
-                  }`}
-                >
-                  None
-                </Text>
-              </Pressable>
-              {categories.map((c) => {
-                const isActive = categoryId === c.id;
-                return (
-                  <Pressable
-                    key={c.id}
-                    onPress={() => setCategoryId(c.id)}
-                    className={`px-4 py-2 rounded-full ${
-                      isActive ? "bg-primary" : "bg-card border border-border"
-                    }`}
-                  >
-                    <Text
-                      className={`text-sm font-sans-medium ${
-                        isActive ? "text-primary-foreground" : "text-muted-foreground"
-                      }`}
-                    >
-                      {c.name}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
+            <CategoryPicker
+              categories={categories}
+              selectedId={categoryId}
+              onSelect={setCategoryId}
+              onCreate={createCategory}
+            />
           </View>
 
           <ReceiptItemsEditor

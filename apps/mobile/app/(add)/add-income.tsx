@@ -1,4 +1,7 @@
+import { CategoryPicker } from "@/components/CategoryPicker";
 import { useAddTransaction } from "@/hooks/useAddTransaction";
+import { usePreferences } from "@/hooks/usePreferences";
+import { CURRENCIES } from "@/lib/currency";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { styled } from "nativewind";
@@ -8,8 +11,22 @@ import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 const SafeAreaView = styled(RNSafeAreaView);
 
 const AddIncome = () => {
-  const { title, setTitle, amount, setAmount, categoryId, setCategoryId, categories, saving, error, save } =
-    useAddTransaction("income");
+  const { currency } = usePreferences();
+  const currencySymbol = CURRENCIES.find((c) => c.code === currency)?.symbol ?? "$";
+
+  const {
+    title,
+    setTitle,
+    amount,
+    setAmount,
+    categoryId,
+    setCategoryId,
+    categories,
+    createCategory,
+    saving,
+    error,
+    save,
+  } = useAddTransaction("income");
 
   const handleSubmit = async () => {
     const success = await save();
@@ -32,7 +49,7 @@ const AddIncome = () => {
         <View className="items-center py-6 gap-2">
           <View className="flex-row items-center gap-1 border-b border-border pb-2">
             <Text className="text-success text-4xl font-sans-extrabold">
-              $
+              {currencySymbol}
             </Text>
             <TextInput
               placeholder="0"
@@ -62,42 +79,12 @@ const AddIncome = () => {
           <Text className="text-muted-foreground text-xs font-sans-semibold uppercase tracking-wide">
             Category (optional)
           </Text>
-          <View className="flex-row flex-wrap gap-2">
-            <Pressable
-              onPress={() => setCategoryId(null)}
-              className={`px-4 py-2 rounded-full ${
-                categoryId === null ? "bg-primary" : "bg-card border border-border"
-              }`}
-            >
-              <Text
-                className={`text-sm font-sans-medium ${
-                  categoryId === null ? "text-primary-foreground" : "text-muted-foreground"
-                }`}
-              >
-                None
-              </Text>
-            </Pressable>
-            {categories.map((c) => {
-              const isActive = categoryId === c.id;
-              return (
-                <Pressable
-                  key={c.id}
-                  onPress={() => setCategoryId(c.id)}
-                  className={`px-4 py-2 rounded-full ${
-                    isActive ? "bg-primary" : "bg-card border border-border"
-                  }`}
-                >
-                  <Text
-                    className={`text-sm font-sans-medium ${
-                      isActive ? "text-primary-foreground" : "text-muted-foreground"
-                    }`}
-                  >
-                    {c.name}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
+          <CategoryPicker
+            categories={categories}
+            selectedId={categoryId}
+            onSelect={setCategoryId}
+            onCreate={createCategory}
+          />
         </View>
 
         {error && <Text className="text-destructive text-sm">{error}</Text>}
