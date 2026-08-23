@@ -35,7 +35,7 @@ const Chat = () => {
 
       <KeyboardAvoidingView
         className="flex-1"
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior="padding"
         keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
       >
         <FlatList
