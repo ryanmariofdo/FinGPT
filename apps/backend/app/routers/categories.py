@@ -78,4 +78,11 @@ def delete_category(category_id: UUID, session: SessionDep, user_id: CurrentUser
         )
 
     session.delete(category)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot delete — category is in use by a transaction",
+        )
