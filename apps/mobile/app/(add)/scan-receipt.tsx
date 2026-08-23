@@ -1,7 +1,9 @@
 import { CategoryPicker } from "@/components/CategoryPicker";
 import { ReceiptItemsEditor } from "@/components/ReceiptItemsEditor";
 import { useCategories } from "@/hooks/useCategories";
+import { usePreferences } from "@/hooks/usePreferences";
 import { useScanReceipt } from "@/hooks/useScanReceipt";
+import { CURRENCIES } from "@/lib/currency";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { styled } from "nativewind";
@@ -12,6 +14,9 @@ const SafeAreaView = styled(RNSafeAreaView);
 const ScanReceipt = () => {
   const { transactionId } = useLocalSearchParams<{ transactionId?: string }>();
   const isAttach = !!transactionId;
+
+  const { currency } = usePreferences();
+  const currencySymbol = CURRENCIES.find((c) => c.code === currency)?.symbol ?? "$";
 
   const {
     imageUri,
@@ -105,7 +110,7 @@ const ScanReceipt = () => {
             <View className="items-center py-2 gap-2">
               <View className="flex-row items-center gap-1 border-b border-border pb-2">
                 <Text className="text-destructive text-4xl font-sans-extrabold">
-                  $
+                  {currencySymbol}
                 </Text>
                 <TextInput
                   placeholder="0"

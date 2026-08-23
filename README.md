@@ -77,4 +77,4 @@ npx expo start
 - Chat conversations are not persisted — history resets when the app restarts.
 
 ---
-© Copyright [Ryan Mario](https://github.com/ryanmariofdo)
+© Developed by: [Ryan Mario](https://github.com/ryanmariofdo)

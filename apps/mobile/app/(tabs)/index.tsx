@@ -1,13 +1,14 @@
 import "@/global.css";
 import { DonutChart } from "@/components/DonutChart";
 import { useFinances } from "@/hooks/useFinances";
+import { usePreferences } from "@/hooks/usePreferences";
+import { useProfile } from "@/hooks/useProfile";
+import { formatCurrency } from "@/lib/currency";
+import { router } from "expo-router";
 import { styled } from "nativewind";
-import { RefreshControl, ScrollView, Text, View } from "react-native";
+import { Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 const SafeAreaView = styled(RNSafeAreaView);
-
-const formatAmount = (amount: number) =>
-  `${amount >= 0 ? "+" : "−"}$${Math.abs(amount).toFixed(2)}`;
 
 const CHART_COLORS = [
   "#2E6FF2",
@@ -20,6 +21,9 @@ const CHART_COLORS = [
 
 export default function App() {
   const { summary, categoryBreakdown, loading, error, refetch } = useFinances();
+  const { currency } = usePreferences();
+  const { initial } = useProfile();
+  const formatAmount = (amount: number) => formatCurrency(amount, currency);
 
   const pieData = categoryBreakdown.map((item, index) => ({
     value: item.value,
@@ -34,6 +38,20 @@ export default function App() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={refetch} />}
       >
+        <View className="flex-row items-center justify-between">
+          <Text className="text-foreground text-2xl font-sans-bold">
+            FinGPT
+          </Text>
+          <Pressable
+            onPress={() => router.push("/profile")}
+            className="w-8 h-8 rounded-full bg-primary items-center justify-center"
+          >
+            <Text className="text-primary-foreground text-sm font-sans-bold">
+              {initial}
+            </Text>
+          </Pressable>
+        </View>
+
         {error && <Text className="text-destructive text-sm">{error}</Text>}
 
         {summary && (
@@ -43,7 +61,7 @@ export default function App() {
                 Monthly Expenses
               </Text>
               <Text className="text-destructive text-2xl font-sans-bold">
-                {formatAmount(-summary.expenses)}
+                {formatAmount(summary.expenses)}
               </Text>
             </View>
 
@@ -60,7 +78,7 @@ export default function App() {
 
         <View className="bg-card rounded-2xl p-5 gap-4">
           <Text className="text-muted-foreground text-xs font-sans-semibold uppercase tracking-wide">
-            Spending by Category
+            Monthly Spending by Category
           </Text>
 
           {pieData.length > 0 ? (
@@ -85,7 +103,7 @@ export default function App() {
                       </Text>
                     </View>
                     <Text className="text-muted-foreground text-sm font-sans-medium">
-                      {formatAmount(-item.value)}
+                      {formatAmount(item.value)}
                     </Text>
                   </View>
                 ))}

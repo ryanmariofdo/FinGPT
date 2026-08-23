@@ -1,14 +1,16 @@
 import { TIME_RANGES, useInsights } from "@/hooks/useInsights";
+import { usePreferences } from "@/hooks/usePreferences";
+import { formatCurrency } from "@/lib/currency";
 import { styled } from "nativewind";
 import React from "react";
 import { Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 const SafeAreaView = styled(RNSafeAreaView);
 
-const formatAmount = (amount: number) =>
-  `${amount >= 0 ? "" : "− "}$${Math.abs(amount).toFixed(0)}`;
-
 const Insights = () => {
+  const { currency } = usePreferences();
+  const formatAmount = (amount: number) => formatCurrency(amount, currency, { decimals: 0 });
+
   const {
     timeRange,
     setTimeRange,
@@ -117,7 +119,7 @@ const Insights = () => {
             Total (filtered)
           </Text>
           <Text className="text-foreground text-4xl font-sans-bold">
-            {formatAmount(-total)}
+            {formatAmount(total)}
           </Text>
         </View>
 

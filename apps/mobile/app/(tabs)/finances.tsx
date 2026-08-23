@@ -1,13 +1,12 @@
 import { SOURCES, TYPES, useFinances } from "@/hooks/useFinances";
+import { usePreferences } from "@/hooks/usePreferences";
+import { formatCurrency } from "@/lib/currency";
 import { router } from "expo-router";
 import { styled } from "nativewind";
 import React from "react";
 import { Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 const SafeAreaView = styled(RNSafeAreaView);
-
-const formatAmount = (amount: number) =>
-  `${amount >= 0 ? "+" : "−"}$${Math.abs(amount).toFixed(2)}`;
 
 const Finances = () => {
   const {
@@ -24,6 +23,8 @@ const Finances = () => {
     error,
     refetch,
   } = useFinances();
+  const { currency } = usePreferences();
+  const formatAmount = (amount: number) => formatCurrency(amount, currency);
 
   return (
     <SafeAreaView edges={["top", "left", "right"]} className="flex-1 bg-background">
@@ -137,15 +138,7 @@ const Finances = () => {
                 Expenses
               </Text>
               <Text className="text-destructive text-base font-sans-bold">
-                {formatAmount(-summary.expenses)}
-              </Text>
-            </View>
-            <View className="gap-1">
-              <Text className="text-muted-foreground text-xs font-sans-semibold uppercase tracking-wide">
-                Net
-              </Text>
-              <Text className="text-foreground text-base font-sans-bold">
-                {formatAmount(summary.net)}
+                {formatAmount(summary.expenses)}
               </Text>
             </View>
           </View>

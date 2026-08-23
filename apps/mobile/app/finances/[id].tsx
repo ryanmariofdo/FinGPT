@@ -1,6 +1,8 @@
 import { CategoryPicker } from "@/components/CategoryPicker";
 import { ReceiptItemsEditor } from "@/components/ReceiptItemsEditor";
 import { useTransactionDetail } from "@/hooks/useTransactionDetail";
+import { usePreferences } from "@/hooks/usePreferences";
+import { CURRENCIES, formatCurrency } from "@/lib/currency";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { styled } from "nativewind";
@@ -23,11 +25,12 @@ const SOURCE_LABEL: Record<string, string> = {
   receipt: "Scanned",
 };
 
-const formatAmount = (amount: number) =>
-  `${amount >= 0 ? "+" : "−"}$${Math.abs(amount).toFixed(2)}`;
-
 const FinanceDetails = () => {
   const id = useLocalSearchParams<{ id: string }>().id;
+  const { currency } = usePreferences();
+  const formatAmount = (amount: number) => formatCurrency(amount, currency);
+  const currencySymbol = CURRENCIES.find((c) => c.code === currency)?.symbol ?? "$";
+
   const {
     transaction,
     categoryName,
@@ -134,7 +137,7 @@ const FinanceDetails = () => {
                   >
                     <Text className="text-foreground text-sm">{item.name}</Text>
                     <Text className="text-foreground text-sm font-sans-medium">
-                      ${Number(item.amount).toFixed(2)}
+                      {formatCurrency(Number(item.amount), currency)}
                     </Text>
                   </View>
                 ))}
@@ -199,7 +202,7 @@ const FinanceDetails = () => {
 
           <View className="items-center py-2 gap-2">
             <View className="flex-row items-center gap-1 border-b border-border pb-2">
-              <Text className="text-destructive text-4xl font-sans-extrabold">$</Text>
+              <Text className="text-destructive text-4xl font-sans-extrabold">{currencySymbol}</Text>
               <TextInput
                 placeholder="0"
                 placeholderTextColor="#5A6068"
