@@ -1,3 +1,4 @@
+import { CategoryPicker } from "@/components/CategoryPicker";
 import { ReceiptItemsEditor } from "@/components/ReceiptItemsEditor";
 import { useTransactionDetail } from "@/hooks/useTransactionDetail";
 import { Ionicons } from "@expo/vector-icons";
@@ -31,6 +32,7 @@ const FinanceDetails = () => {
     transaction,
     categoryName,
     categories,
+    createCategory,
     loading,
     error,
     editing,
@@ -233,42 +235,12 @@ const FinanceDetails = () => {
             <Text className="text-muted-foreground text-xs font-sans-semibold uppercase tracking-wide">
               Category (optional)
             </Text>
-            <View className="flex-row flex-wrap gap-2">
-              <Pressable
-                onPress={() => setCategoryId(null)}
-                className={`px-4 py-2 rounded-full ${
-                  categoryId === null ? "bg-primary" : "bg-card border border-border"
-                }`}
-              >
-                <Text
-                  className={`text-sm font-sans-medium ${
-                    categoryId === null ? "text-primary-foreground" : "text-muted-foreground"
-                  }`}
-                >
-                  None
-                </Text>
-              </Pressable>
-              {categories.map((c) => {
-                const isActive = categoryId === c.id;
-                return (
-                  <Pressable
-                    key={c.id}
-                    onPress={() => setCategoryId(c.id)}
-                    className={`px-4 py-2 rounded-full ${
-                      isActive ? "bg-primary" : "bg-card border border-border"
-                    }`}
-                  >
-                    <Text
-                      className={`text-sm font-sans-medium ${
-                        isActive ? "text-primary-foreground" : "text-muted-foreground"
-                      }`}
-                    >
-                      {c.name}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
+            <CategoryPicker
+              categories={categories}
+              selectedId={categoryId}
+              onSelect={setCategoryId}
+              onCreate={createCategory}
+            />
           </View>
 
           <ReceiptItemsEditor

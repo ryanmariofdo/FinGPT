@@ -1,19 +1,15 @@
 import { api } from "@/lib/api";
-import { useEffect, useState } from "react";
-
-type Category = { id: string; name: string };
+import { useCategories } from "@/hooks/useCategories";
+import { useState } from "react";
 
 export function useAddTransaction(kind: "expense" | "income") {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [categoryId, setCategoryId] = useState<string | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    api.get("/categories").then(setCategories).catch((err) => setError(err.message));
-  }, []);
+  const { categories, createCategory } = useCategories();
 
   const save = async () => {
     const parsed = Number(amount);
@@ -52,6 +48,7 @@ export function useAddTransaction(kind: "expense" | "income") {
     categoryId,
     setCategoryId,
     categories,
+    createCategory,
     saving,
     error,
     save,

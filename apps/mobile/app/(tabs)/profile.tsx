@@ -1,4 +1,6 @@
 import { useProfile } from "@/hooks/useProfile";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { styled } from "nativewind";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
@@ -9,7 +11,7 @@ const Profile = () => {
   const { email, initial, signOut } = useProfile();
 
   return (
-    <SafeAreaView className="flex-1 bg-background p-5 gap-6">
+    <SafeAreaView edges={["top", "left", "right"]} className="flex-1 bg-background p-5 gap-6">
       <Text className="text-foreground text-2xl font-sans-bold">
         Profile
       </Text>
@@ -29,6 +31,16 @@ const Profile = () => {
           </Text>
         </View>
       </View>
+
+      <Pressable
+        onPress={() => router.push("/preferences")}
+        className="flex-row items-center justify-between bg-card rounded-2xl p-4"
+      >
+        <Text className="text-foreground text-base font-sans-medium">
+          Preferences
+        </Text>
+        <Ionicons name="chevron-forward" size={18} color="#8B939B" />
+      </Pressable>
 
       <Pressable
         onPress={signOut}
