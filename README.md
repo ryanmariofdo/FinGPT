@@ -12,12 +12,12 @@ An AI-powered finance copilot that automatically tracks finances and delivers pe
 
 ## 🛠️ Tech Stack
 
-| Layer           | Technology                                                                             |
-| --------------- | -------------------------------------------------------------------------------------- |
-| Mobile          | React Native, Expo Router, NativeWind                                                  |
-| Backend         | Python, FastAPI, SQLModel, Alembic                                                     |
-| Database & Auth | Supabase (Postgres + Auth), Row Level Security                                         |
-| File storage    | Supabase Storage (receipt images)                                                      |
+| Layer           | Technology                                        |
+| --------------- | ------------------------------------------------- |
+| Mobile          | React Native, Expo Router, NativeWind             |
+| Backend         | Python, FastAPI, SQLModel, Alembic                |
+| Database & Auth | Supabase (Postgres + Auth), Row Level Security    |
+| File storage    | Supabase Storage (receipt images)                 |
 | AI provider     | NVIDIA NIM (`meta/llama-3.2-11b-vision-instruct`) |
 
 ## Getting Started
@@ -58,16 +58,13 @@ cd apps/backend
 source .venv/Scripts/activate   # Windows Git Bash
 fastapi dev main.py --host 0.0.0.0
 ```
+
 ### Mobile
 
 ```bash
 cd apps/mobile
 npx expo start
 ```
-
-
-
-
 
 ## Known Limitations (Future Implementations)
 
@@ -77,4 +74,5 @@ npx expo start
 - Chat conversations are not persisted — history resets when the app restarts.
 
 ---
-© Developed by: [Ryan Mario](https://github.com/ryanmariofdo)
+
+Developed by: [Ryan Mario](https://github.com/ryanmariofdo)
