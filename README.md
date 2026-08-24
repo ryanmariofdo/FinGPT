@@ -33,9 +33,12 @@ pip install "fastapi[standard]" sqlmodel "psycopg[binary]" pydantic-settings ale
 cp .env.example .env   # fill in DATABASE_URL, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, NVIDIA_API_KEY
 
 alembic upgrade head
+fastapi dev main.py --host 0.0.0.0
 ```
 
 API docs available at `http://127.0.0.1:8000/docs`.
+
+A physical device needs the backend reachable over HTTPS (Expo Go/dev-client blocks plain HTTP). Either point `EXPO_PUBLIC_API_URL` at the hosted backend below, or tunnel your local server with ngrok during active development.
 
 ### Mobile
 
@@ -43,35 +46,60 @@ API docs available at `http://127.0.0.1:8000/docs`.
 cd apps/mobile
 cp .env.example .env   # fill in EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_ANON_KEY, EXPO_PUBLIC_API_URL
 npm install
-```
-
-A physical device requires the backend reachable over HTTPS (Expo Go/dev-client blocks plain HTTP). Use an ngrok tunnel pointed at the backend and set `EXPO_PUBLIC_API_URL` accordingly.
-
-## Wanna try the app?
-
-Install APK build: https://expo.dev/accounts/ryanmario/projects/fingpt/builds/967246cb-3c34-4bb1-9c26-20f1d2f65f04
-
-### Backend
-
-```bash
-cd apps/backend
-source .venv/Scripts/activate   # Windows Git Bash
-fastapi dev main.py --host 0.0.0.0
-```
-
-### Mobile
-
-```bash
-cd apps/mobile
 npx expo start
 ```
 
-## Known Limitations (Future Implementations)
+## Environment Variables
 
-- Currently automated sms capture only works for Android.
-- CORS is currently wide open (`allow_origins=["*"]`) — fine for local development, must be restricted before any real deployment.
-- No rate limiting or cost controls on the chatbot endpoint yet.
-- Chat conversations are not persisted — history resets when the app restarts.
+### 1. Backend Configuration
+
+Create a `.env` file in `apps/backend` based on `.env.example`:
+
+```bash
+# Supabase project settings -> Database -> Connection string (pooler, port 6543)
+DATABASE_URL=postgresql+psycopg://postgres.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@[YOUR-POOLER-HOST]:6543/postgres
+
+# Supabase project settings -> API -> Project URL
+SUPABASE_URL=https://[YOUR-PROJECT-REF].supabase.co
+
+# Supabase project settings -> API -> Secret keys (server-only, never expose to mobile)
+SUPABASE_SERVICE_ROLE_KEY=[YOUR-SUPABASE-SERVICE-ROLE-KEY]
+
+# build.nvidia.com -> pick a model -> API key
+NVIDIA_API_KEY=[YOUR-NVIDIA-API-KEY]
+```
+
+### 2. Mobile Configuration
+
+Create a `.env` file in `apps/mobile` based on `.env.example`:
+
+```bash
+# Supabase project settings -> API -> Project URL (same project as the backend)
+EXPO_PUBLIC_SUPABASE_URL=https://[YOUR-PROJECT-REF].supabase.co
+
+# Supabase project settings -> API -> Publishable key
+EXPO_PUBLIC_SUPABASE_ANON_KEY=[YOUR-PUBLISHABLE-KEY]
+
+# The backend's base URL. Use the hosted URL below, or your machine's local
+# network IP / an ngrok URL when running the backend locally.
+EXPO_PUBLIC_API_URL=https://fingpt.up.railway.app
+```
+
+Never commit either `.env` file.
+
+## Hosted Backend
+
+The backend is deployed on [Railway](https://railway.com) at `https://fingpt.up.railway.app`, connected to the `main` branch for automatic redeploys. Every deploy runs pending Alembic migrations before starting the server. Point `EXPO_PUBLIC_API_URL` at this URL to use the app without running the backend locally.
+
+## 📱 Wanna try the app?
+
+The app is preconfigured to talk to the hosted backend above — no local setup required.
+
+- Install APK build: https://expo.dev/accounts/ryanmario/projects/fingpt/builds/967246cb-3c34-4bb1-9c26-20f1d2f65f04
+
+- In `apps/mobile` termainal, run `npx expo start` and scan provided QR code.
+
+⚠️ Note that SMS auto capture feature, is currently unavailable in iOS.
 
 ---
 
