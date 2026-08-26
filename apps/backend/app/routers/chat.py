@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 
 from app.deps import CurrentUserId, SessionDep
 from app.schemas.chat import ChatRequest, ChatResponse
-from app.services.chat import SYSTEM_PROMPT, _build_finance_context
+from app.services.chat import SYSTEM_PROMPT, _build_finance_context, _looks_like_injection
 from app.services.nvidia import get_nvidia_client
 from app.services.rate_limit import check_rate_limit
 
@@ -17,6 +17,12 @@ def chat(body: ChatRequest, session: SessionDep, user_id: CurrentUserId):
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="You've reached your hourly message limit (5/hour). Try again later.",
+        )
+
+    if _looks_like_injection(body.messages[-1].content):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Message couldn't be processed. Please ask a finance-related question.",
         )
 
     context = _build_finance_context(session, user_id)
