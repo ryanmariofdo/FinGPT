@@ -1,22 +1,29 @@
+import { useDeleteAccount } from "@/hooks/useDeleteAccount";
 import { usePreferences } from "@/hooks/usePreferences";
 import { CURRENCIES, CurrencyCode } from "@/lib/currency";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { styled } from "nativewind";
 import { useState } from "react";
-import { Modal, Pressable, Text, View } from "react-native";
+import { Modal, Pressable, Text, TextInput, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 const SafeAreaView = styled(RNSafeAreaView);
 
 const General = () => {
   const { currency, setCurrency } = usePreferences();
   const [pickerVisible, setPickerVisible] = useState(false);
+  const { password, setPassword, deleting, error, deleteAccount } = useDeleteAccount();
+  const [deleteVisible, setDeleteVisible] = useState(false);
 
   const currentLabel = CURRENCIES.find((c) => c.code === currency)?.code ?? currency;
 
   const handleSelect = async (code: CurrencyCode) => {
     setPickerVisible(false);
     await setCurrency(code);
+  };
+
+  const handleDeleteAccount = async () => {
+    await deleteAccount();
   };
 
   return (
@@ -93,6 +100,65 @@ const General = () => {
                 </Pressable>
               );
             })}
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      <View className="px-5 pt-8 mt-auto pb-5">
+        <Pressable
+          onPress={() => setDeleteVisible(true)}
+          className="bg-card rounded-2xl p-4 items-center"
+        >
+          <Text className="text-destructive text-base font-sans-semibold">
+            Delete Account
+          </Text>
+        </Pressable>
+      </View>
+
+      <Modal
+        visible={deleteVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setDeleteVisible(false)}
+      >
+        <Pressable
+          onPress={() => setDeleteVisible(false)}
+          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" }}
+        >
+          <Pressable
+            className="bg-surface rounded-t-3xl p-6 gap-3"
+            onPress={(e) => e.stopPropagation()}
+          >
+            <Text className="text-foreground text-base font-sans-semibold">
+              Delete Account
+            </Text>
+            <Text className="text-muted-foreground text-sm">
+              This permanently deletes your account and all your data. This
+              can't be undone. Enter your password to confirm.
+            </Text>
+
+            <TextInput
+              placeholder="Password"
+              placeholderTextColor="#5A6068"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              className="bg-card rounded-2xl px-4 py-3 text-foreground border border-border"
+            />
+
+            {error && <Text className="text-destructive text-sm">{error}</Text>}
+
+            <Pressable
+              onPress={handleDeleteAccount}
+              disabled={deleting || !password}
+              className={`bg-destructive rounded-2xl py-4 items-center ${
+                deleting || !password ? "opacity-60" : ""
+              }`}
+            >
+              <Text className="text-primary-foreground font-sans-semibold text-base">
+                {deleting ? "Deleting..." : "Delete Account"}
+              </Text>
+            </Pressable>
           </Pressable>
         </Pressable>
       </Modal>

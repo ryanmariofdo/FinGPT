@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import categories, chat, health, preferences, receipts, sms_ingest, transactions
+from app.routers import account, categories, chat, health, preferences, receipts, sms_ingest, transactions
 
 app = FastAPI()
 
@@ -13,6 +13,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(account.router)
 app.include_router(health.router)
 app.include_router(categories.router)
 app.include_router(chat.router)
