@@ -38,6 +38,36 @@ class ParsedTransaction(BaseModel):
     confidence: float
 
 
+_BANK_KEYWORDS = [
+    "authorised",
+    "authorized",
+    "debit card",
+    "credit card",
+    "purchase",
+    "withdrawn",
+    "withdrawal",
+    "deposited",
+    "deposit",
+    "balance",
+    "transaction",
+    "transferred",
+    "spent",
+    "debited",
+    "credited",
+    "atm",
+    "pos ",
+]
+
+_AMOUNT_PATTERN = re.compile(r"\b\d[\d,]*\.\d{2}\b")
+
+
+def looks_like_bank_sms(raw_text: str) -> bool:
+    lowered = raw_text.lower()
+    has_amount = bool(_AMOUNT_PATTERN.search(raw_text))
+    has_bank_keyword = any(keyword in lowered for keyword in _BANK_KEYWORDS)
+    return has_amount and has_bank_keyword
+
+
 def _extract_json_object(text: str) -> dict:
     match = re.search(r"\{.*\}", text, re.DOTALL)
     if match is None:

@@ -11,5 +11,6 @@ class SmsIngestRequest(SQLModel):
 
 
 class SmsIngestResponse(SQLModel):
-    transaction: TransactionRead
+    transaction: TransactionRead | None
     duplicate: bool
+    skipped: bool = False

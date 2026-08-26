@@ -10,7 +10,7 @@ from app.models import Transaction
 from app.models.transaction import TransactionSource
 from app.schemas.sms_ingest import SmsIngestRequest, SmsIngestResponse
 from app.schemas.transaction import TransactionRead
-from app.services.sms_parsing import parse_transaction_sms
+from app.services.sms_parsing import looks_like_bank_sms, parse_transaction_sms
 
 DEDUPE_WINDOW = timedelta(minutes=5)
 CONFIDENCE_THRESHOLD = 0.7
@@ -33,6 +33,9 @@ def _to_read(transaction: Transaction) -> TransactionRead:
 
 @router.post("/ingest-sms", response_model=SmsIngestResponse)
 def ingest_sms(body: SmsIngestRequest, session: SessionDep, user_id: CurrentUserId):
+    if not looks_like_bank_sms(body.raw_text):
+        return SmsIngestResponse(transaction=None, duplicate=False, skipped=True)
+
     dedupe_hash = _dedupe_hash(user_id, body.raw_text)
     window_start = datetime.utcnow() - DEDUPE_WINDOW
 
