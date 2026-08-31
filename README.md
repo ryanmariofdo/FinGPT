@@ -1,5 +1,7 @@
 # FinGPT
 
+![image_alt](https://github.com/ryanmariofdo/FinGPT/blob/2771e8ac75a5edff4eebb4c7aa885058f8c49a65/apps/mobile/FinGPT.png)
+
 An AI-powered finance copilot that automatically tracks finances and delivers personalized financial advice.
 
 ## 🚀 Features
